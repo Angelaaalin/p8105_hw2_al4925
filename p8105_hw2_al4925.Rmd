@@ -1,0 +1,81 @@
+---
+title: "p8105_hw2_al4925"
+author: "Angela Lin"
+date: "2025-10-01"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+```
+
+## Problem 1
+```{r}
+pols_df = read.csv("fivethirtyeight_datasets/pols-month.csv", na = c("NA", "")) |>
+  janitor::clean_names() |> 
+  separate(col = mon, into = c("year", "month", "day")) |>
+  mutate(year = as.integer(year),
+         month = as.integer(month), 
+         month = month.name[month],
+         president = case_when(prez_gop == 1 ~ "gop", prez_dem == 1 ~ "dem")) |>
+  select(-prez_dem, -prez_gop, -day)
+```
+
+```{r}
+snp_df = read.csv("fivethirtyeight_datasets/snp.csv", na = c("NA", "")) |>
+  janitor::clean_names() |>    
+  separate(col = date, into = c("month", "day", "year"), sep = "/") |>
+  mutate(year = as.integer(year),
+         year = ifelse(year <= 15, year + 2000, year + 1900), 
+         month = as.integer(month), 
+         month = month.name[month]) |>
+  relocate(year, month) |>
+  select(-day)
+```
+
+```{r}
+unemployment_df = read.csv("fivethirtyeight_datasets/unemployment.csv", na = c("NA", "")) |>
+  janitor::clean_names() |>
+  pivot_longer(jan:dec, 
+               names_to = "month", 
+               values_to = "unemployment percentage") |>
+  mutate(month = factor(month, levels = tolower(month.abb), labels = month.name),
+         year = as.integer(year))
+```
+
+```{r}
+merge_df = merge(pols_df, snp_df, by = c("year", "month"), all.x = TRUE)
+merge_df = merge(merge_df, unemployment_df, by = c("year", "month"), all.x = TRUE)
+```
+
+Description
+
+
+## Problem 2
+```{r}
+trash_wheel_df = read_excel("202509 Trash Wheel Collection Data.xlsx", na = c("NA", "")) |>
+  janitor::clean_names() |>
+  select(-date) |>
+  mutate(sports_balls = round(as.integer(sports_balls), 1)) |>
+  relocate(year, month)
+
+```
+
+Description
+
+## Problem 3
+```{r}
+zipcodes_df = read.csv("zillow_data/Zip Codes.csv", na = c("NA", "")) |>
+  janitor::clean_names() |>
+  select(-File.Date)
+
+```
+
+```{r}
+zori_df = read_csv("zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv", na = c("NA", "")) |>
+  janitor::clean_names() |>
+  
+``` 
