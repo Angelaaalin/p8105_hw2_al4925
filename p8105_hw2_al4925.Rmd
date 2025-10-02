@@ -106,7 +106,21 @@ merge_trash_df = bind_rows(mr_df, prof_df, gwy_df) |>
             homes_powered = sum(homes_powered, na.rm = TRUE))
 ```
 
-Description
+```{r}
+trash_prof = merge_trash_df |> 
+  filter(wheels == "Professor") 
+total_weight_prof = sum(trash_prof$weight_tons)
+total_weight_prof
+
+cig = merge_trash_df |>
+  filter(wheels == "Gwynnda", year == 2022, month == "June")
+total_cig_gwy = sum(cig$cigarette_butts)
+total_cig_gwy
+  
+
+```
+After organizing and tidying three dataset, I combined them into a single one `merge_trash_df`. There are 269 observations and 12 variables, telling total trash weight collected based on wheels in each month in years. The total weight of trash collected by Professor Trash Wheels is 564.52 tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is 18120.
+
 
 ## Problem 3
 ```{r}
