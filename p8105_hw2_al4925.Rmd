@@ -41,7 +41,7 @@ unemployment_df = read.csv("fivethirtyeight_datasets/unemployment.csv", na = c("
   janitor::clean_names() |>
   pivot_longer(jan:dec, 
                names_to = "month", 
-               values_to = "unemployment percentage") |>
+               values_to = "unemployment_percentage") |>
   mutate(month = factor(month, levels = tolower(month.abb), labels = month.name),
          year = as.integer(year))
 ```
@@ -58,7 +58,7 @@ Description
 ```{r}
 trash_wheel_df = read_excel("202509 Trash Wheel Collection Data.xlsx", na = c("NA", "")) |>
   janitor::clean_names() |>
-  select(-date) |>
+  select(-date, -x15, -x16) |>
   mutate(sports_balls = round(as.integer(sports_balls), 1)) |>
   relocate(year, month)
 
@@ -70,12 +70,19 @@ Description
 ```{r}
 zipcodes_df = read.csv("zillow_data/Zip Codes.csv", na = c("NA", "")) |>
   janitor::clean_names() |>
-  select(-File.Date)
+  select(-file_date)
 
 ```
 
 ```{r}
 zori_df = read_csv("zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv", na = c("NA", "")) |>
   janitor::clean_names() |>
+  select(-state_name, -state, -region_type) |>
+  rename(zip_code = region_name, 
+         county = county_name) |>
+  mutate(county = str_remove(county, fixed("County"))) |>
+  relocate(county)
+
+  
   
 ``` 
