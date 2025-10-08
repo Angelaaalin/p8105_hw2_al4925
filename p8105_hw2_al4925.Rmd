@@ -136,9 +136,43 @@ zori_df = read_csv("zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv", na = 
   select(-state_name, -state, -region_type) |>
   rename(zip_code = region_name, 
          county = county_name) |>
-  mutate(county = str_remove(county, fixed("County"))) |>
-  relocate(county)
+  pivot_longer(x2015_01_31:x2024_08_31,
+               names_to = "date",
+               values_to = "rental_price") |>
+  separate(col = date, into = c("year", "month", "day"), sep = "_") |>
+  mutate(year = str_remove(year, "x"),
+         year = as.integer(year),
+         month = as.integer(month),
+         day = as.integer(day),
+         county = str_remove(county, fixed("County"))) |>
+  relocate(county, year, month, day) |>
+  select(-day)
+  
+```
+```{r}
+merge_rental = full_join(zipcodes_df, zori_df)
+#bind_rows(zori_df, zipcodes_df) 
+#|> summarise(rental_price = sum(rental_price))
+#jan = merge_rental %>% filter(merge_rental$year == 2020,  merge_rental$year == 2021 & merge_rental$month == 1)
 
-  
-  
-``` 
+# jan = merge_rental %>% filter(merge_rental$year == 2021 & merge_rental$month == 1)
+
+
+#zip_num = length(unique(merge_rental$zip_code))
+#zip_num
+#neighbor_num = length(unique(merge_rental$neighborhood))
+#neighbor_num
+
+
+```
+```{r}
+price_drop = jan_2021$rental_price - jan_2020$rental_price
+
+jan_2020_price = mean(jan_2020$rental_price, na.rm = TRUE)
+jan_2020_price
+jan_2021_price = mean(jan_2021$rental_price, na.rm = TRUE)
+jan_2021_price
+```
+
+The resulting tidy dataset is `merge_rental`. It contains 17606 observations and 13 variables. There are 320 unique ZIP code and 43 unique neighborhood included. 
+
